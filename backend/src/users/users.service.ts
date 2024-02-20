@@ -8,6 +8,27 @@ import pool from "../db";
 export class UsersService {
   private readonly logger: Logger = new Logger(UsersService.name);
 
+  // TODO: Requires to be encrypted to login!
+  async login(email: string, password: string) : Promise<User> {
+    const t = 'SELECT * FROM users WHERE email = $1 AND password = $2';
+
+    const q = {
+        text: t,
+        values: [email, password]
+    }
+
+    const res = await pool.query(q);
+
+    if (res.rows.length === 0) {
+      this.logger.error('User not found')
+      return;
+    }
+
+    delete res.rows[0].password;
+
+    return res.rows[0] as User;
+  }
+
   async create(createUserDto: CreateUserDto) : Promise<User> {
     const t = 'INSERT INTO users (name, email, password, role, state) VALUES ($1, $2, $3, $4, $5) RETURNING *';
 
