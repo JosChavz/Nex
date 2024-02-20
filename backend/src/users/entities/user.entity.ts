@@ -1,5 +1,5 @@
 import {ApiProperty} from "@nestjs/swagger";
-import {IsEmail} from "class-validator";
+import {IS_UUID, IsEmail, IsUUID} from "class-validator";
 
 export enum UserRole {
     Admin = 'Admin',
@@ -13,6 +13,9 @@ export enum UserState {
 }
 
 export class User {
+    @ApiProperty()
+    @IsUUID()
+    id: string;
     @ApiProperty()
     name: string;
     @ApiProperty()
