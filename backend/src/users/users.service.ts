@@ -7,7 +7,16 @@ import pool from "../db";
 @Injectable()
 export class UsersService {
   async create(createUserDto: CreateUserDto) : Promise<User> {
-    console.log(createUserDto, 'createUserDto', createUserDto.updated_at, 'createUserDto.updated_at');
+    const t = 'INSERT INTO users (username, email, password, role, state) VALUES ($1, $2, $3, $4, $5) RETURNING id';
+
+    const q = {
+        text: t,
+        values: [createUserDto.name, createUserDto.email, createUserDto.password, createUserDto.role, createUserDto.state]
+    }
+
+    const res = await pool.query(q)
+    console.log(res.rows[0])
+
     return;
   }
 

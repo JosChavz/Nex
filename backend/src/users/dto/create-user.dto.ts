@@ -24,8 +24,4 @@ export class CreateUserDto {
         default: UserState.Onboarding
     })
     state: UserState = UserState.Onboarding;
-    @ApiHideProperty()
-    created_at: Date = new Date();
-    @ApiHideProperty()
-    updated_at: Date = new Date();
 }
