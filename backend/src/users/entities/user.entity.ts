@@ -22,4 +22,8 @@ export class User {
     role: UserRole;
     @ApiProperty({enum: UserState})
     state: UserState;
+    @ApiProperty()
+    created_at: Date;
+    @ApiProperty()
+    updated_at: Date;
 }

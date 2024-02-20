@@ -20,4 +20,14 @@ export class CreateUserDto {
         default: UserState.Onboarding
     })
     state: UserState;
+    @ApiProperty({
+        required: false,
+        default: new Date()
+    })
+    created_at: Date;
+    @ApiProperty({
+        required: false,
+        default: new Date()
+    })
+    updated_at: Date;
 }
