@@ -7,6 +7,7 @@ import pool from "../db";
 @Injectable()
 export class UsersService {
   async create(createUserDto: CreateUserDto) : Promise<User> {
+    console.log(createUserDto, 'createUserDto', createUserDto.updated_at, 'createUserDto.updated_at');
     return;
   }
 

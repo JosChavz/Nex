@@ -1,33 +1,31 @@
-import {ApiProperty} from "@nestjs/swagger";
+import {ApiHideProperty, ApiProperty} from "@nestjs/swagger";
 import {UserRole, UserState} from "../entities/user.entity";
+import {IsEmail, IsNotEmpty} from "class-validator";
 
 export class CreateUserDto {
     @ApiProperty()
+    @IsNotEmpty()
     name: string;
+    @IsEmail()
     @ApiProperty()
     email: string;
     @ApiProperty()
+    @IsNotEmpty()
     password: string;
     @ApiProperty({
         enum: UserRole,
         required: false,
         default: UserRole.User,
     })
-    role: UserRole;
+    role: UserRole = UserRole.User;
     @ApiProperty({
         enum: UserState,
         required: false,
         default: UserState.Onboarding
     })
-    state: UserState;
-    @ApiProperty({
-        required: false,
-        default: new Date()
-    })
-    created_at: Date;
-    @ApiProperty({
-        required: false,
-        default: new Date()
-    })
-    updated_at: Date;
+    state: UserState = UserState.Onboarding;
+    @ApiHideProperty()
+    created_at: Date = new Date();
+    @ApiHideProperty()
+    updated_at: Date = new Date();
 }
