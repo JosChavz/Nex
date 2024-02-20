@@ -28,7 +28,18 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return;
+    const t = 'SELECT * FROM users';
+    const res = await pool.query(t).catch(e => {
+        this.logger.error(e.detail)
+        throw new Error(e.code)
+    });
+
+    // Deletes password from the response
+    for (let i = 0; i < res.rows.length; i++) {
+        delete res.rows[i].password;
+    }
+
+    return res.rows as User[];
   }
 
   async findOne(id: number) : Promise<User> {
