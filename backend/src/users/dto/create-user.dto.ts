@@ -11,7 +11,7 @@ export class CreateUserDto {
     @ApiProperty({
         enum: UserRole,
         required: false,
-        default: UserRole.User
+        default: UserRole.User,
     })
     role: UserRole;
     @ApiProperty({
