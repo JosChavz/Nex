@@ -1,28 +1,33 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  ValidationPipe,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
   UsePipes,
-  HttpException, HttpStatus
+  ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {User} from "./entities/user.entity";
-import {ApiResponse} from "@nestjs/swagger";
+import { User, UserRole } from './entities/user.entity';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { Roles } from '../roles/roles.decorator';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({transform: true}))
-  @ApiResponse({ status: 409, description: 'UserAlreadyExists.'})
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiResponse({ status: 409, description: 'UserAlreadyExists.' })
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     let user: User;
 
@@ -35,7 +40,10 @@ export class UsersController {
         case '23505':
           throw new HttpException('Email already in use', HttpStatus.CONFLICT);
         default:
-          throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+          throw new HttpException(
+            'Internal server error',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
       }
     }
 
@@ -43,17 +51,22 @@ export class UsersController {
   }
 
   @Get()
-  async findAll() : Promise<User[]>{
+  @ApiBearerAuth()
+  @Roles(UserRole.Admin, UserRole.Moderator)
+  async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) : Promise<User> {
+  async findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(+id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto)  : Promise<User> {
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     return this.usersService.update(+id, updateUserDto);
   }
 
