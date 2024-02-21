@@ -4,6 +4,7 @@ import {Request} from 'express';
 import {Reflector} from "@nestjs/core";
 import {UserRole} from "../users/entities/user.entity";
 import {ROLES_KEY} from "../roles/roles.decorator";
+require('dotenv').config()
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -39,7 +40,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
-    return requiredRoles.some((role) => user.roles?.includes(role));
+    return requiredRoles.some((role) => user.role?.includes(role));
 
   }
 

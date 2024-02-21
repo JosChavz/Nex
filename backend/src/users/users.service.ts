@@ -19,6 +19,8 @@ export class UsersService {
 
     const res = await pool.query(q);
 
+    console.log(res.rows)
+
     if (res.rows.length === 0) {
       this.logger.error('User not found')
       return;
