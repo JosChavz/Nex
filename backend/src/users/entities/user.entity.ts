@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity } from 'typeorm';
+import { General } from '../../../entities/general.entity';
 
 export enum UserRole {
   Admin = 'Admin',
@@ -8,18 +8,22 @@ export enum UserRole {
   User = 'User',
 }
 
+export const ALL_USER_ROLES: UserRole[] = [
+  UserRole.Admin,
+  UserRole.Moderator,
+  UserRole.User,
+];
+
 export enum UserState {
   Onboarding = 'Onboarding',
   Active = 'Active',
+  Inactive = 'Inactive',
 }
 
-@Entity()
-export class User {
-  @ApiProperty()
-  @IsUUID()
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+@Entity({
+  name: 'users',
+})
+export class User extends General {
   @ApiProperty()
   @Column({
     type: 'text',
@@ -27,13 +31,17 @@ export class User {
   })
   name: string;
 
-  @Column()
+  @Column({
+    type: 'text',
+    nullable: false,
+  })
   password: string;
 
   @ApiProperty()
   @Column({
     type: 'text',
     nullable: false,
+    unique: true,
   })
   email: string;
 
@@ -59,19 +67,4 @@ export class User {
   })
   @ApiProperty({ enum: UserState })
   state: UserState;
-
-  @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  @ApiProperty()
-  created_at: Date;
-
-  @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  @ApiProperty()
-  updated_at: Date;
 }

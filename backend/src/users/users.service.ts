@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -20,77 +20,39 @@ export class UsersService {
       email,
       password,
     });
-    // const t = 'SELECT * FROM users WHERE email = $1 AND password = $2';
-    //
-    // const q = {
-    //   text: t,
-    //   values: [email, password],
-    // };
-    //
-    // const res = await pool.query(q);
-    //
-    // if (res.rows.length === 0) {
-    //   this.logger.error('User not found');
-    //   return;
-    // }
-    //
-    // delete res.rows[0].password;
-    //
-    // return res.rows[0] as User;
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    return;
-    // const t =
-    //   'INSERT INTO users (name, email, password, role, state) VALUES ($1, $2, $3, $4, $5) RETURNING *';
-    //
-    // const q = {
-    //   text: t,
-    //   values: [
-    //     createUserDto.name,
-    //     createUserDto.email,
-    //     createUserDto.password,
-    //     createUserDto.role,
-    //     createUserDto.state,
-    //   ],
-    // };
-    //
-    // const res = await pool.query(q).catch((e) => {
-    //   this.logger.error(e.detail);
-    //   throw new Error(e.code);
-    // });
-    //
-    // const user = res.rows[0];
-    // delete user.password;
-    //
-    // return res.rows[0] as User;
+    await this.users.insert(createUserDto);
+    return await this.users.findOne({
+      where: {
+        email: createUserDto.email,
+      },
+    });
   }
 
   async findAll(): Promise<User[]> {
-    return [];
-    // const t = 'SELECT * FROM users';
-    // const res = await pool.query(t).catch((e) => {
-    //   this.logger.error(e.detail);
-    //   throw new Error(e.code);
-    // });
-    //
-    // // Deletes password from the response
-    // for (let i = 0; i < res.rows.length; i++) {
-    //   delete res.rows[i].password;
-    // }
-    //
-    // return res.rows as User[];
+    return await this.users.find();
   }
 
-  async findOne(id: number): Promise<User> {
-    return;
+  async findOne(id: string): Promise<User> {
+    return await this.users.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    return;
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.users.update(id, updateUserDto);
+    return await this.users.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
-  async remove(id: number): Promise<User> {
-    return;
+  async remove(id: string): Promise<User> {
+    return await this.users.remove(await this.users.findOne({ where: { id } }));
   }
 }
