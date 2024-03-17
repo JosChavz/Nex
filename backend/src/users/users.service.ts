@@ -1,22 +1,25 @@
-import {Inject, Injectable, Logger} from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import {Repository} from "typeorm";
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
   private readonly logger: Logger = new Logger(UsersService.name);
 
   constructor(
-      @Inject('USER_REPOSITORY')
-      private users: Repository<User>
-  ) {
-  }
+    @InjectRepository(User)
+    private users: Repository<User>,
+  ) {}
 
   // TODO: Requires to be encrypted to login!
   async login(email: string, password: string): Promise<User> {
-    return;
+    return await this.users.findOneBy({
+      email,
+      password,
+    });
     // const t = 'SELECT * FROM users WHERE email = $1 AND password = $2';
     //
     // const q = {

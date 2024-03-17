@@ -6,8 +6,6 @@ import {
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entities/user.entity';
-import * as process from "process";
-require('dotenv').config();
 
 @Injectable()
 @Dependencies(UsersService, JwtService)
