@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   ParseUUIDPipe,
@@ -41,6 +42,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  // TODO: A boolean to get users with their skills to. By default, it should be false.
   @Get(':id')
   @Public()
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
@@ -76,7 +78,9 @@ export class UsersController {
   ): Promise<User> {
     // Verify the logged-in user is the same as the user being updated
     if (user.id !== userId) {
-      throw new Error('You are not authorized to update this user.');
+      throw new ForbiddenException(
+        'You are not authorized to update this user.',
+      );
     }
     return this.usersService.updateSkills(userId, skillIds);
   }

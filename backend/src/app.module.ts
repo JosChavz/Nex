@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
 import { SkillsModule } from './skills/skills.module';
 import { Skill } from './skills/entities/skill.entity';
+import { ProjectsModule } from './projects/projects.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -25,6 +26,7 @@ import { Skill } from './skills/entities/skill.entity';
     UsersModule,
     AuthModule,
     SkillsModule,
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
