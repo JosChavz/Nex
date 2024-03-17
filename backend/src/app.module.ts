@@ -20,6 +20,7 @@ import { Skill } from './skills/entities/skill.entity';
       database: process.env.POSTGRES_DB || 'root',
       entities: [User, Skill],
       synchronize: true, // DO NOT USE IN PRODUCTION
+      // logging: true,
     }),
     UsersModule,
     AuthModule,

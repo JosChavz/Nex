@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Skill } from '../skills/entities/skill.entity';
+import { idArrayDto } from '../../entities/idArray.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private users: Repository<User>,
-    @InjectRepository(User)
+    @InjectRepository(Skill)
     private skills: Repository<Skill>,
   ) {}
 
@@ -59,7 +60,7 @@ export class UsersService {
     return await this.users.remove(await this.users.findOne({ where: { id } }));
   }
 
-  async updateSkills(userId: string, skillIds: string[]) {
+  async updateSkills(userId: string, skillIds: idArrayDto) {
     const user: User = await this.users.findOne({
       where: {
         id: userId,
@@ -67,7 +68,7 @@ export class UsersService {
       relations: ['skills'],
     });
     user.skills = await this.skills.findBy({
-      id: In(skillIds),
+      id: In(skillIds.ids),
     });
     await this.users.save(user);
     return user;

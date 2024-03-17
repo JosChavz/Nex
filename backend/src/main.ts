@@ -20,7 +20,7 @@ async function bootstrap() {
     })
     .setTitle('Nex API')
     .setDescription('All the endpoints for the Nex API.')
-    .setVersion('2.0.0')
+    .setVersion('2.1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {

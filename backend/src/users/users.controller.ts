@@ -19,6 +19,8 @@ import { ALL_USER_ROLES, User, UserRole } from './entities/user.entity';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { Public, Roles } from '../roles/roles.decorator';
 import { AuthGuard } from '../auth/auth.guard';
+import { AuthUser } from './users.decorator';
+import { idArrayDto } from '../../entities/idArray.dto';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -66,10 +68,16 @@ export class UsersController {
   @Put(':id/skills')
   @ApiBearerAuth()
   @Roles(UserRole.User)
+  @UsePipes(new ValidationPipe({ transform: true }))
   async updateSkills(
     @Param('id', ParseUUIDPipe) userId: string,
-    @Body('skillIds', ParseUUIDPipe) skillIds: string[],
+    @Body() skillIds: idArrayDto,
+    @AuthUser() user: any,
   ): Promise<User> {
+    // Verify the logged-in user is the same as the user being updated
+    if (user.id !== userId) {
+      throw new Error('You are not authorized to update this user.');
+    }
     return this.usersService.updateSkills(userId, skillIds);
   }
 }
