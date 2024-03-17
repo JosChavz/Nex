@@ -13,7 +13,7 @@ export class SkillsService {
     @InjectRepository(Skill)
     private skills: Repository<Skill>,
   ) {}
-  async create(createSkillDto: CreateSkillDto) {
+  async create(createSkillDto: CreateSkillDto): Promise<Skill> {
     await this.skills.insert(createSkillDto);
     return await this.skills.findOne({
       where: {
@@ -22,11 +22,11 @@ export class SkillsService {
     });
   }
 
-  async findAll() {
+  async findAll(): Promise<Skill[]> {
     return await this.skills.find();
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<Skill> {
     return await this.skills.findOne({
       where: {
         id,
@@ -34,11 +34,16 @@ export class SkillsService {
     });
   }
 
-  async update(id: string, updateSkillDto: UpdateSkillDto) {
-    return await this.skills.update(id, updateSkillDto);
+  async update(id: string, updateSkillDto: UpdateSkillDto): Promise<Skill> {
+    await this.skills.update(id, updateSkillDto);
+    return await this.skills.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<Skill> {
     return await this.skills.remove(
       await this.skills.findOne({ where: { id } }),
     );

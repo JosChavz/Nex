@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { General } from '../../../entities/general.entity';
+import { Skill } from '../../skills/entities/skill.entity';
 
 export enum UserRole {
   Admin = 'Admin',
@@ -67,4 +68,18 @@ export class User extends General {
   })
   @ApiProperty({ enum: UserState })
   state: UserState;
+
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: 'user_skills',
+    joinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'skillId',
+      referencedColumnName: 'id',
+    },
+  })
+  skills: Skill[];
 }

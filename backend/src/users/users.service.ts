@@ -2,8 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Skill } from '../skills/entities/skill.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +13,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private users: Repository<User>,
+    @InjectRepository(User)
+    private skills: Repository<Skill>,
   ) {}
 
   // TODO: Requires to be encrypted to login!
@@ -54,5 +57,19 @@ export class UsersService {
 
   async remove(id: string): Promise<User> {
     return await this.users.remove(await this.users.findOne({ where: { id } }));
+  }
+
+  async updateSkills(userId: string, skillIds: string[]) {
+    const user: User = await this.users.findOne({
+      where: {
+        id: userId,
+      },
+      relations: ['skills'],
+    });
+    user.skills = await this.skills.findBy({
+      id: In(skillIds),
+    });
+    await this.users.save(user);
+    return user;
   }
 }

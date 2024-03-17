@@ -4,8 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -15,7 +17,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ALL_USER_ROLES, User, UserRole } from './entities/user.entity';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
-import { Roles } from '../roles/roles.decorator';
+import { Public, Roles } from '../roles/roles.decorator';
 import { AuthGuard } from '../auth/auth.guard';
 
 @UseGuards(AuthGuard)
@@ -26,25 +28,29 @@ export class UsersController {
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiResponse({ status: 409, description: 'UserAlreadyExists.' })
+  @Public()
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return await this.usersService.create(createUserDto);
   }
 
   @Get()
+  @Public()
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<User> {
+  @Public()
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @ApiBearerAuth()
   @Roles(...ALL_USER_ROLES)
+  @UsePipes(new ValidationPipe({ transform: true }))
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     return this.usersService.update(id, updateUserDto);
@@ -53,7 +59,17 @@ export class UsersController {
   @Delete(':id')
   @ApiBearerAuth()
   @Roles(UserRole.Admin)
-  async remove(@Param('id') id: string): Promise<User> {
+  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
     return this.usersService.remove(id);
+  }
+
+  @Put(':id/skills')
+  @ApiBearerAuth()
+  @Roles(UserRole.User)
+  async updateSkills(
+    @Param('id', ParseUUIDPipe) userId: string,
+    @Body('skillIds', ParseUUIDPipe) skillIds: string[],
+  ): Promise<User> {
+    return this.usersService.updateSkills(userId, skillIds);
   }
 }

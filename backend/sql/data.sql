@@ -1,4 +1,5 @@
 DELETE FROM users;
+DELETE FROM skills;
 
 -- Users
 INSERT INTO users (name, email, password, role, state) VALUES ('admin', 'admin@email.com', 'admin', 'Admin', 'Active');
