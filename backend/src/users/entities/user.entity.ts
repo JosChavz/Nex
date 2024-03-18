@@ -1,7 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { General } from '../../../entities/general.entity';
 import { Skill } from '../../skills/entities/skill.entity';
+import { Project } from '../../projects/entities/project.entity';
 
 export enum UserRole {
   Admin = 'Admin',
@@ -25,7 +25,6 @@ export enum UserState {
   name: 'users',
 })
 export class User extends General {
-  @ApiProperty()
   @Column({
     type: 'text',
     nullable: false,
@@ -38,7 +37,6 @@ export class User extends General {
   })
   password: string;
 
-  @ApiProperty()
   @Column({
     type: 'text',
     nullable: false,
@@ -50,7 +48,6 @@ export class User extends General {
     type: 'text',
     nullable: true,
   })
-  @ApiProperty()
   profilePic: string;
 
   @Column({
@@ -58,7 +55,6 @@ export class User extends General {
     enum: UserRole,
     default: UserRole.User,
   })
-  @ApiProperty({ enum: UserRole })
   role: UserRole;
 
   @Column({
@@ -66,10 +62,9 @@ export class User extends General {
     enum: UserState,
     default: UserState.Onboarding,
   })
-  @ApiProperty({ enum: UserState })
   state: UserState;
 
-  @ManyToMany(() => Skill)
+  @ManyToMany(() => Skill, (skill) => skill.id)
   @JoinTable({
     name: 'user_skills',
     joinColumn: {
@@ -82,4 +77,21 @@ export class User extends General {
     },
   })
   skills: Skill[];
+
+  @OneToMany(() => Project, (project) => project.owner)
+  projectsOwned: Project[];
+
+  @ManyToMany(() => Project)
+  @JoinTable({
+    name: 'project_contributors',
+    joinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'projectId',
+      referencedColumnName: 'id',
+    },
+  })
+  projectsContributed: Project[];
 }

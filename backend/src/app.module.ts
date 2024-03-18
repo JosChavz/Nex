@@ -8,6 +8,7 @@ import { User } from './users/entities/user.entity';
 import { SkillsModule } from './skills/skills.module';
 import { Skill } from './skills/entities/skill.entity';
 import { ProjectsModule } from './projects/projects.module';
+import { Project } from './projects/entities/project.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -19,7 +20,7 @@ import { ProjectsModule } from './projects/projects.module';
       username: process.env.POSTGRES_USER || 'root',
       password: process.env.POSTGRES_PASSWORD || 'root',
       database: process.env.POSTGRES_DB || 'root',
-      entities: [User, Skill],
+      entities: [User, Skill, Project],
       synchronize: true, // DO NOT USE IN PRODUCTION
       // logging: true,
     }),

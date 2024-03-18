@@ -29,5 +29,12 @@ export class CreateUserDto {
     required: false,
     default: UserState.Onboarding,
   })
-  state: UserState = UserState.Onboarding;
+  state: UserState;
+
+  @ApiProperty({
+    type: String,
+    description: 'The profile picture of the user',
+    required: false,
+  })
+  profilePic: string;
 }

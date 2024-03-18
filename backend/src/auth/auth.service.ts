@@ -6,6 +6,7 @@ import {
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entities/user.entity';
+import { AuthToken } from './auth.interface';
 
 @Injectable()
 @Dependencies(UsersService, JwtService)
@@ -23,7 +24,7 @@ export class AuthService {
       throw new UnauthorizedException(); // Wouldn't it be a 404?
     }
 
-    const payload = {
+    const payload: AuthToken = {
       username: user.name,
       id: user.id,
       role: user.role,

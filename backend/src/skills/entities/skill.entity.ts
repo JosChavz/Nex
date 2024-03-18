@@ -6,7 +6,6 @@ import { ApiProperty } from '@nestjs/swagger';
   name: 'skills',
 })
 export class Skill extends General {
-  @ApiProperty()
   @Column({
     type: 'text',
     nullable: false,
