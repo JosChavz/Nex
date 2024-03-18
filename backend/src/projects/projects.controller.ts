@@ -49,6 +49,11 @@ export class ProjectsController {
     return this.projectsService.findOne(id);
   }
 
+  @Get(':id/contributors')
+  async getContributors(@Param('id', ParseUUIDPipe) id: string) {
+    return this.projectsService.getContributors(id);
+  }
+
   @Patch(':id')
   @ApiBearerAuth()
   @Roles(...ALL_USER_ROLES)
