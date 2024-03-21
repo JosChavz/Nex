@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -40,14 +40,23 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User> {
-    return await this.users.findOne({
+    const existingUser: User | null = await this.users.findOne({
       where: {
         id,
       },
     });
+
+    if (!existingUser) throw new NotFoundException('User is not found');
+
+    return existingUser;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const userExists = await this.users.count({
+      where: { id },
+    });
+    if (!userExists) throw new NotFoundException('User is not found');
+
     await this.users.update(id, updateUserDto);
     return await this.users.findOne({
       where: {

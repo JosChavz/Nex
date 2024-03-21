@@ -22,6 +22,7 @@ import { Public, Roles } from '../roles/roles.decorator';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthUser } from './users.decorator';
 import { idArrayDto } from '../../entities/idArray.dto';
+import { AuthToken } from 'src/auth/auth.interface';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -74,7 +75,7 @@ export class UsersController {
   async updateSkills(
     @Param('id', ParseUUIDPipe) userId: string,
     @Body() skillIds: idArrayDto,
-    @AuthUser() user: any,
+    @AuthUser() user: AuthToken,
   ): Promise<User> {
     // Verify the logged-in user is the same as the user being updated
     if (user.id !== userId) {
