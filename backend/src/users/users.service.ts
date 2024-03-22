@@ -69,13 +69,19 @@ export class UsersService {
     return await this.users.remove(await this.users.findOne({ where: { id } }));
   }
 
-  async updateSkills(userId: string, skillIds: idArrayDto) {
+  async updateSkills(userId: string, skillIds: idArrayDto): Promise<User> {
     const user: User = await this.users.findOne({
       where: {
         id: userId,
       },
       relations: ['skills'],
     });
+
+    if (!user) throw new NotFoundException('User is not found');
+
+    // TODO: Needs to handle IDs that do not exist in DB
+    // findBy -> array of Skill then way to verify is to check the length of
+    // skillIds.ids with returned value ??? maybe not worth it
     user.skills = await this.skills.findBy({
       id: In(skillIds.ids),
     });

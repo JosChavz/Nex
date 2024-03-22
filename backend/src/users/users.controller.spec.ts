@@ -8,16 +8,17 @@ import { User, UserRole, UserState } from './entities/user.entity';
 import { randomUUID } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Skill } from '../skills/entities/skill.entity';
 import { idArrayDto } from 'entities/idArray.dto';
+import { AuthToken } from '../auth/auth.interface';
 
 describe('UsersController', () => {
   let controller: UsersController;
   const created_at = new Date();
   let updated_at = created_at; // Subject to change
 
-  const skills: Skill[] = [
+  const mockSkills: Skill[] = [
     {
       id: uuidv4(),
       name: 'TypeORM',
@@ -38,54 +39,62 @@ describe('UsersController', () => {
     },
   ];
 
-  const users: User[] = [
-    {
-      id: uuidv4(),
-      name: 'Cody',
-      email: 'cody@ucsc.edu',
-      password: 'cody123',
-      role: UserRole.Admin,
-      state: UserState.Active,
-      profilePic: '',
-      created_at,
-      updated_at,
-      skills: [],
-      projectsOwned: [],
-      projectsContributed: [],
-    },
-    {
-      id: uuidv4(),
-      name: 'Jose',
-      email: 'jose@ucsc.edu',
-      password: 'jose123',
-      role: UserRole.User,
-      state: UserState.Active,
-      profilePic: '',
-      created_at,
-      updated_at,
-      skills: [],
-      projectsOwned: [],
-      projectsContributed: [],
-    },
-    {
-      id: uuidv4(),
-      name: 'Eric',
-      email: 'eric@ucsc.edu',
-      password: 'cody123',
-      role: UserRole.Moderator,
-      state: UserState.Active,
-      profilePic: '',
-      created_at,
-      updated_at,
-      skills: [],
-      projectsOwned: [],
-      projectsContributed: [],
-    },
-  ];
+  const userCody: User = {
+    id: uuidv4(),
+    name: 'Cody',
+    email: 'cody@ucsc.edu',
+    password: 'cody123',
+    role: UserRole.Admin,
+    state: UserState.Active,
+    profilePic: '',
+    created_at,
+    updated_at,
+    skills: [],
+    projectsOwned: [],
+    projectsContributed: [],
+  };
 
-  const userLookup = (id: string) => users.find((user: User) => user.id == id);
-  const skillLookup = (id: string) =>
-    skills.find((skill: Skill) => skill.id == id);
+  const userJose: User = {
+    id: uuidv4(),
+    name: 'Jose',
+    email: 'jose@ucsc.edu',
+    password: 'jose123',
+    role: UserRole.User,
+    state: UserState.Active,
+    profilePic: '',
+    created_at,
+    updated_at,
+    skills: [],
+    projectsOwned: [],
+    projectsContributed: [],
+  };
+
+  const userEric: User = {
+    id: uuidv4(),
+    name: 'Eric',
+    email: 'eric@ucsc.edu',
+    password: 'cody123',
+    role: UserRole.Moderator,
+    state: UserState.Active,
+    profilePic: '',
+    created_at,
+    updated_at,
+    skills: [],
+    projectsOwned: [],
+    projectsContributed: [],
+  };
+
+  let mockUsers: User[] = [userCody, userJose, userEric];
+
+  const userLookup = (id: string) =>
+    mockUsers.find((user: User) => user.id == id);
+  const skillLookup = (skillIds: idArrayDto) => {
+    // Looping through the skillIds DTO
+    return skillIds.ids.map((id: string) => {
+      // Loop through the mock skill array
+      return mockSkills.find((skill: Skill) => skill.id === id);
+    });
+  };
 
   const mockUserService = {
     create: jest
@@ -103,7 +112,9 @@ describe('UsersController', () => {
           };
         },
       ),
-    findAll: jest.fn().mockImplementation(async (): Promise<User[]> => users),
+    findAll: jest
+      .fn()
+      .mockImplementation(async (): Promise<User[]> => mockUsers),
     findOne: jest.fn().mockImplementation(async (id: string): Promise<User> => {
       const existingUser = userLookup(id);
       if (!existingUser) throw new NotFoundException('User is not found');
@@ -126,8 +137,14 @@ describe('UsersController', () => {
     remove: jest.fn().mockImplementation(userLookup),
     updateSkills: jest
       .fn()
-      .mockImplementation((id: string, skillIds: idArrayDto) => {
-        // const skill: Skill = skillLookup(skillIds)
+      .mockImplementation((id: string, skillIds: idArrayDto): Promise<User> => {
+        const newSkills: Skill[] = skillLookup(skillIds);
+        const currentUser: User = userLookup(id);
+        if (!currentUser) throw new NotFoundException('User is not found');
+
+        currentUser.skills = newSkills;
+
+        return Promise.resolve(currentUser);
       }),
   };
 
@@ -137,15 +154,16 @@ describe('UsersController', () => {
     canActivate: (context) => {
       const req = context.switchToHttp().getRequest();
       req.user = {
-        username: users[0].name,
-        id: users[0].id,
-        role: users[0].role,
+        username: mockUsers[0].name,
+        id: mockUsers[0].id,
+        role: mockUsers[0].role,
       };
       return true;
     },
   };
 
   beforeEach(async () => {
+    mockUsers = [userCody, userJose, userEric];
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [UsersService, SkillsService],
@@ -159,6 +177,7 @@ describe('UsersController', () => {
       .compile();
 
     controller = module.get<UsersController>(UsersController);
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -187,13 +206,13 @@ describe('UsersController', () => {
     expect(mockUserService.create).toHaveBeenCalledWith(newUserData);
   });
 
-  it('find all users', async () => {
-    expect(await controller.findAll()).toEqual(users);
+  it('find all mockUsers', async () => {
+    expect(await controller.findAll()).toEqual(mockUsers);
     expect(mockUserService.findAll).toHaveBeenCalled();
   });
 
   it('find a specific user', async () => {
-    expect(await controller.findOne(users[0].id)).toEqual(users[0]);
+    expect(await controller.findOne(mockUsers[0].id)).toEqual(mockUsers[0]);
   });
 
   it('throws an exception if a user cannot be found', async () => {
@@ -201,30 +220,76 @@ describe('UsersController', () => {
   });
 
   it('updates user information', async () => {
-    const firstUser: User = users[0];
+    const currUser: User = userJose; // UserRole = User
     const userUpdate: UpdateUserDto = {
       name: 'Jose Chavez',
       state: UserState.Inactive,
-      role: UserRole.Admin,
+      role: UserRole.Admin, // NOT GOOD
     };
 
-    expect(await controller.update(firstUser.id, userUpdate)).toEqual({
-      ...firstUser,
+    const loggedInUser: AuthToken = {
+      username: currUser.name,
+      id: currUser.id,
+      role: currUser.role,
+    };
+
+    expect(
+      await controller.update(currUser.id, userUpdate, loggedInUser),
+    ).toEqual({
+      ...currUser,
       ...userUpdate,
       updated_at,
     });
   });
 
   it('throws an exception to update user if id is not found', async () => {
-    await expect(controller.update('23', {})).rejects.toThrow(
-      NotFoundException,
+    const loggedInUser: AuthToken = {
+      username: userJose.name,
+      id: userJose.id,
+      role: userJose.role,
+    };
+    await expect(controller.update('23', {}, loggedInUser)).rejects.toThrow(
+      ForbiddenException,
     );
   });
 
-  // TODO: Needs to admit Roles because only Admins have access to this controller
   it('allows for user to delete their own account', async () => {
-    expect(await controller.remove(users[0].id)).toEqual(users[0]);
+    expect(await controller.remove(mockUsers[0].id)).toEqual(mockUsers[0]);
   });
 
-  it('updates user skills', async () => {});
+  it('updates user mockSkills', async () => {
+    const currUser: User = userJose;
+    const skillIds: idArrayDto = {
+      ids: [mockSkills[0].id],
+    };
+    const currAuthToken: AuthToken = {
+      username: currUser.name,
+      id: currUser.id,
+      role: currUser.role,
+    };
+
+    const expectedResult: User = {
+      ...currUser,
+      skills: [mockSkills[0]],
+    };
+    expect(
+      await controller.updateSkills(currUser.id, skillIds, currAuthToken),
+    ).toEqual(expectedResult);
+  });
+
+  it("throws an exception when user tries to update another user's skills", async () => {
+    const currUser: User = userJose;
+    const skillIds: idArrayDto = {
+      ids: [mockSkills[0].id],
+    };
+    const currAuthToken: AuthToken = {
+      username: userCody.name,
+      id: userCody.id,
+      role: userCody.role,
+    };
+    await expect(
+      controller.updateSkills(currUser.id, skillIds, currAuthToken),
+    ).rejects.toThrow(ForbiddenException);
+    expect(mockUserService.updateSkills).not.toHaveBeenCalled();
+  });
 });

@@ -50,6 +50,8 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  // NOTE: Users with the role User are able to change their Role
+  // Not the best option to go with.
   @Patch(':id')
   @ApiBearerAuth()
   @Roles(...ALL_USER_ROLES)
@@ -57,7 +59,13 @@ export class UsersController {
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
+    @AuthUser() user: AuthToken,
   ): Promise<User> {
+    // User is unable to update other user's information
+    if (id !== user.id && user.role == UserRole.User)
+      throw new ForbiddenException(
+        'You are not authorized to update this user.',
+      );
     return this.usersService.update(id, updateUserDto);
   }
 
