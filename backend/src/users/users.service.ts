@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -18,6 +23,7 @@ export class UsersService {
     private skills: Repository<Skill>,
   ) {}
 
+  // No need for testing because it will change later
   // TODO: Requires to be encrypted to login!
   async login(email: string, password: string): Promise<User> {
     return await this.users.findOneBy({
@@ -27,7 +33,12 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    await this.users.insert(createUserDto);
+    try {
+      await this.users.insert(createUserDto);
+    } catch (e) {
+      throw new BadRequestException('User already exists.');
+    }
+
     return await this.users.findOne({
       where: {
         email: createUserDto.email,
@@ -40,7 +51,7 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User> {
-    const existingUser: User | null = await this.users.findOne({
+    const existingUser: User = await this.users.findOne({
       where: {
         id,
       },
@@ -52,7 +63,7 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const userExists = await this.users.count({
+    const userExists: number = await this.users.count({
       where: { id },
     });
     if (!userExists) throw new NotFoundException('User is not found');
@@ -66,9 +77,15 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<User> {
-    return await this.users.remove(await this.users.findOne({ where: { id } }));
+    const existingUser: User = await this.users.findOne({ where: { id } });
+
+    if (!existingUser) throw new NotFoundException('User does not exist.');
+
+    return await this.users.remove(existingUser);
   }
 
+  // Not the best practice due to merging issues
+  // NOTE: updateSkills vs addSkills - What is the difference?
   async updateSkills(userId: string, skillIds: idArrayDto): Promise<User> {
     const user: User = await this.users.findOne({
       where: {

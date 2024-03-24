@@ -17,7 +17,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ALL_USER_ROLES, User, UserRole } from './entities/user.entity';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { Public, Roles } from '../roles/roles.decorator';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthUser } from './users.decorator';
@@ -31,7 +31,6 @@ export class UsersController {
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  @ApiResponse({ status: 409, description: 'UserAlreadyExists.' })
   @Public()
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return await this.usersService.create(createUserDto);
