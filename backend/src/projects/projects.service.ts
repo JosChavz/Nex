@@ -1,10 +1,12 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project, ProjectState } from './entities/project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
+import { Skill } from '../skills/entities/skill.entity';
+import { idArrayDto } from '../../entities/idArray.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -13,6 +15,8 @@ export class ProjectsService {
     private projects: Repository<Project>,
     @InjectRepository(User)
     private users: Repository<User>,
+    @InjectRepository(Skill)
+    private skills: Repository<Skill>,
   ) {}
 
   async create(
@@ -51,6 +55,23 @@ export class ProjectsService {
         id,
       },
     });
+  }
+
+  async appendSkill(projectId: string, skillIds: idArrayDto): Promise<Project> {
+    const project: Project = await this.projects.findOne({
+      where: {
+        id: projectId,
+      },
+      relations: ['skills'],
+    });
+
+    if (!project) throw new NotFoundException('User is not found');
+
+    project.skills = await this.skills.findBy({
+      id: In(skillIds.ids),
+    });
+    await this.projects.save(project);
+    return project;
   }
 
   async update(

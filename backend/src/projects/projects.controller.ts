@@ -3,10 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -20,6 +22,8 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { ALL_USER_ROLES, UserRole } from '../users/entities/user.entity';
 import { AuthUser } from '../users/users.decorator';
 import { AuthToken } from '../auth/auth.interface';
+import { idArrayDto } from '../../entities/idArray.dto';
+import { Project } from './entities/project.entity';
 
 @UseGuards(AuthGuard)
 @Controller('projects')
@@ -83,5 +87,23 @@ export class ProjectsController {
       user.id,
       user.role !== UserRole.User,
     );
+  }
+
+  @Put(':id/skills')
+  @ApiBearerAuth()
+  @Roles(UserRole.User)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async appendSkill(
+    @Param('id', ParseUUIDPipe) projectId: string,
+    @Body() skillIds: idArrayDto,
+  ): Promise<Project> {
+    const project = await this.projectsService.findOne(projectId);
+    if (!project) {
+      throw new NotFoundException('Project Not Found');
+    }
+
+    // project.skills = skillIds.ids;
+
+    return this.projectsService.appendSkill(projectId, skillIds);
   }
 }

@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
 import { General } from '../../../entities/general.entity';
+import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
 
 export enum ProjectState {
@@ -29,6 +30,20 @@ export class Project extends General {
     default: ProjectState.Draft,
   })
   state: ProjectState;
+
+  @ManyToMany(() => Skill, (skill) => skill.id)
+  @JoinTable({
+    name: 'project_skills',
+    joinColumn: {
+      name: 'projectId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'skillId',
+      referencedColumnName: 'id',
+    },
+  })
+  skills: Skill[];
 
   @ManyToOne(() => User, (user) => user.projectsOwned, {
     onDelete: 'CASCADE',
