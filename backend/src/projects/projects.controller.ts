@@ -19,7 +19,7 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { Public, Roles } from '../roles/roles.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { ALL_USER_ROLES, UserRole } from '../users/entities/user.entity';
+import { ALL_USER_ROLES, User, UserRole } from '../users/entities/user.entity';
 import { AuthUser } from '../users/users.decorator';
 import { AuthToken } from '../auth/auth.interface';
 import { idArrayDto } from '../../entities/idArray.dto';
@@ -57,6 +57,20 @@ export class ProjectsController {
   // async getContributors(@Param('id', ParseUUIDPipe) id: string) {
   //   return this.projectsService.getContributors(id);
   // }
+  @Get(':id/contributors')
+  @Get(':id/contributors')
+  @Public()
+  async getContributors(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<User[]> {
+    // Checks to see if the project exists
+    const project: Project = await this.projectsService.findOne(id);
+    if (!project) {
+      throw new NotFoundException('Project does not exist.');
+    }
+
+    return this.projectsService.getContributors(id);
+  }
 
   @Patch(':id')
   @ApiBearerAuth()

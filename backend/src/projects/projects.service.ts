@@ -1,7 +1,11 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { Project, ProjectState } from './entities/project.entity';
+import { Project } from './entities/project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
@@ -72,6 +76,24 @@ export class ProjectsService {
     });
     await this.projects.save(project);
     return project;
+  }
+
+  async getContributors(id: string): Promise<User[]> {
+    const projectContributors: User[] = await this.users
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.projectsContributed', 'project')
+      .where('project.id = :id', { id })
+      .getMany();
+
+    const projectOwner: User = await this.users.findOne({
+      where: {
+        projectsOwned: {
+          id,
+        },
+      },
+    });
+
+    return [projectOwner, ...projectContributors];
   }
 
   async update(
