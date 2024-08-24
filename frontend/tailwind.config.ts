@@ -18,6 +18,17 @@ const config: Config = {
       colors: {},
     },
     extend: {},
+    container: {
+      padding: '1.5rem',
+      screens: {
+        DEFAULT: '100%',
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1024px',
+        '2xl': '1024px',
+      },
+    },
   },
   darkMode: 'class',
   plugins: [nextui()],

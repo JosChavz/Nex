@@ -29,8 +29,9 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(3000);
+  // Port 3000 is often taken by the front-end
+  await app.listen(3005);
 
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Application is running on: ${await app.getUrl()}/api`);
 }
 bootstrap();

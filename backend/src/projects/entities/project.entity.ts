@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { General } from '../../../entities/general.entity';
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';

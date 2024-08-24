@@ -8,20 +8,31 @@ import {
 } from '@nextui-org/react';
 
 import { Button } from '@nextui-org/button';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function ProfileIcon() {
-  const currentUser = AUTH.currentUser;
+  const [currentUser, setCurrentUser] = useState(AUTH?.currentUser);
 
-  console.log(currentUser);
+  AUTH.onAuthStateChanged((user) => {
+    if (user) {
+      setCurrentUser(user);
+    }
+  });
+
+  console.log('Current User', currentUser);
 
   if (!currentUser) {
     return (
       <>
-        <Button color="secondary" variant="flat" size="sm">
-          Sign In
-        </Button>
-        <Button color="secondary" variant="flat" size="sm">
-          Sign Up
+        <Button
+          color="secondary"
+          variant="flat"
+          size="sm"
+          as={Link}
+          href={'login'}
+        >
+          Login
         </Button>
       </>
     );
