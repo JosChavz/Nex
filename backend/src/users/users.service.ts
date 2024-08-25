@@ -23,12 +23,12 @@ export class UsersService {
     private skills: Repository<Skill>,
   ) {}
 
-  // No need for testing because it will change later
-  // TODO: Requires to be encrypted to login!
-  async login(email: string, password: string): Promise<User> {
-    return await this.users.findOneBy({
-      email,
-      password,
+  // TODO: Find a safer way to login using Supabase
+  async login(email: string): Promise<User> {
+    return await this.users.findOne({
+      where: {
+        email,
+      },
     });
   }
 
@@ -36,6 +36,7 @@ export class UsersService {
     try {
       await this.users.insert(createUserDto);
     } catch (e) {
+      console.log(e);
       throw new BadRequestException('User already exists.');
     }
 
@@ -48,6 +49,14 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return await this.users.find();
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return await this.users.findOne({
+      where: {
+        email,
+      },
+    });
   }
 
   async findOne(id: string): Promise<User> {

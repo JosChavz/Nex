@@ -34,12 +34,6 @@ export class User extends General {
   @Column({
     type: 'text',
     nullable: false,
-  })
-  password: string;
-
-  @Column({
-    type: 'text',
-    nullable: false,
     unique: true,
   })
   email: string;

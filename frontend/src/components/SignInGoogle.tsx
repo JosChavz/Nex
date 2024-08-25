@@ -15,7 +15,7 @@ export async function SignInWithGoogle(
   let wasAuthorized: boolean = false;
 
   await signInWithPopup(AUTH, provider)
-    .then((result) => {
+    .then(async (result) => {
       const credential = GoogleAuthProvider.credentialFromResult(result);
 
       if (!credential) {
@@ -44,6 +44,20 @@ export async function SignInWithGoogle(
       }
 
       wasAuthorized = true;
+
+      // Create the user and login
+      await fetch('http://localhost:3005/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.displayName,
+          profilePic:
+            user.photoURL || 'https://i.pravatar.cc/150?u=' + user.uid, // Is this safe?
+        }),
+      });
     })
     .catch((error) => {
       addSnackbar({
@@ -72,6 +86,7 @@ export default function SignInGoogle() {
             text: 'Successfully Signed In',
             variant: 'success',
           });
+
           router.push('/dashboard');
         }
       }}

@@ -29,10 +29,25 @@ import { AuthToken } from 'src/auth/auth.interface';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // Creates a new user, but returns a user if the User exists already
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @UsePipes(new ValidationPipe())
   @Public()
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
+    // Checks the email address - must be UCSC email address
+    if (
+      createUserDto.email.substring(
+        Number(createUserDto.email.lastIndexOf('@')) + 1,
+      ) !== 'ucsc.edu'
+    ) {
+      throw new ForbiddenException('Email Address should be from UCSC');
+    }
+
+    // Checks to see if the User already exists
+    const exists = await this.usersService.findByEmail(createUserDto.email);
+    if (exists) return exists;
+
+    // Creates the User
     return await this.usersService.create(createUserDto);
   }
 

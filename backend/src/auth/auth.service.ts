@@ -18,8 +18,8 @@ export class AuthService {
     this.usersService = usersService;
   }
 
-  async signIn(email: string, pass: string) {
-    const user: User = await this.usersService.login(email, pass);
+  async signIn(email: string) {
+    const user: User = await this.usersService.login(email);
     if (!user) {
       throw new UnauthorizedException(); // Wouldn't it be a 404?
     }

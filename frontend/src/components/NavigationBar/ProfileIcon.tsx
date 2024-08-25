@@ -20,8 +20,6 @@ export default function ProfileIcon() {
     }
   });
 
-  console.log('Current User', currentUser);
-
   if (!currentUser) {
     return (
       <>

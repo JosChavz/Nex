@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole, UserState } from '../entities/user.entity';
-import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
+import { Unique } from 'typeorm';
 
 export class CreateUserDto {
   @ApiProperty()
@@ -9,13 +10,8 @@ export class CreateUserDto {
 
   @IsEmail()
   @ApiProperty()
+  @Unique(['email'])
   email: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(32)
-  password: string;
 
   @ApiProperty({
     enum: UserRole,
