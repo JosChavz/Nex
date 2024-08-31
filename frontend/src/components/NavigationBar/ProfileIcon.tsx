@@ -9,16 +9,11 @@ import {
 
 import { Button } from '@nextui-org/button';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { NexContext } from '@/lib/context/NexProvider';
 
 export default function ProfileIcon() {
-  const [currentUser, setCurrentUser] = useState(AUTH?.currentUser);
-
-  AUTH.onAuthStateChanged((user) => {
-    if (user) {
-      setCurrentUser(user);
-    }
-  });
+  const { currentUser } = useContext(NexContext);
 
   if (!currentUser) {
     return (

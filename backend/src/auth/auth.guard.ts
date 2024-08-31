@@ -10,6 +10,7 @@ import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import { UserRole } from '../users/entities/user.entity';
 import { IS_PUBLIC_KEY, ROLES_KEY } from '../roles/roles.decorator';
+import { FirebaseAdmin } from '../../config/firebase.setup';
 require('dotenv').config();
 
 @Injectable()
@@ -63,5 +64,34 @@ export class AuthGuard implements CanActivate {
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
+  }
+}
+
+@Injectable()
+export class AuthGuard2 implements CanActivate {
+  constructor(
+    private reflector: Reflector,
+    private readonly admin: FirebaseAdmin,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const app = this.admin.setup();
+    const idToken = context.getArgs()[0]?.headers?.authorization.split(' ')[1];
+
+    const permissions = this.reflector.get<string[]>(
+      'permissions',
+      context.getHandler(),
+    );
+    try {
+      const claims = await app.auth().verifyIdToken(idToken);
+
+      if (claims.role === permissions[0]) {
+        return true;
+      }
+      throw new UnauthorizedException();
+    } catch (error) {
+      console.log('Error', error);
+      throw new UnauthorizedException();
+    }
   }
 }

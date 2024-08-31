@@ -6,13 +6,16 @@ import { AUTH } from '../../firebase-config';
 import { useSnackbar } from '../lib/context/SnackbarProvider';
 import { BiSolidErrorAlt } from 'react-icons/bi';
 import { SnackbarType } from '@/components/types';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
+import { NexContext } from '@/lib/context/NexProvider';
+import { useContext } from 'react';
+import { User } from '@firebase/auth';
 
 export async function SignInWithGoogle(
   addSnackbar: (snack: SnackbarType) => void
-): Promise<boolean> {
+): Promise<User | null> {
   const provider = new GoogleAuthProvider();
-  let wasAuthorized: boolean = false;
+  let tempUser: User | null = null;
 
   await signInWithPopup(AUTH, provider)
     .then(async (result) => {
@@ -24,6 +27,8 @@ export async function SignInWithGoogle(
 
       const token = credential.accessToken;
       const user = result.user;
+
+      console.log('user:', user);
 
       if (!user) throw new Error('No user found');
 
@@ -43,10 +48,8 @@ export async function SignInWithGoogle(
         throw new Error('Unauthorized email address');
       }
 
-      wasAuthorized = true;
-
       // Create the user and login
-      await fetch('http://localhost:3005/api/users', {
+      await fetch('/backend/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,6 +61,8 @@ export async function SignInWithGoogle(
             user.photoURL || 'https://i.pravatar.cc/150?u=' + user.uid, // Is this safe?
         }),
       });
+
+      tempUser = user;
     })
     .catch((error) => {
       addSnackbar({
@@ -68,24 +73,27 @@ export async function SignInWithGoogle(
       });
     });
 
-  return wasAuthorized;
+  return tempUser;
 }
 
 export default function SignInGoogle() {
-  const addSnackbar = useSnackbar();
   const router = useRouter();
+  const addSnackbar = useSnackbar();
+  const { setCurrentUser } = useContext(NexContext);
 
   return (
     <Button
       className="border-stroke dark:text-body-color-dark dark:shadow-two mb-6 flex w-full items-center justify-center rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 hover:border-primary hover:bg-primary/5 hover:text-primary dark:border-transparent dark:bg-[#2C303B] dark:hover:border-primary dark:hover:bg-primary/5 dark:hover:text-primary dark:hover:shadow-none"
       onClick={async () => {
-        const wasAuthorized = await SignInWithGoogle(addSnackbar);
-        if (wasAuthorized) {
+        const tempUser: User | null = await SignInWithGoogle(addSnackbar);
+        if (!!tempUser) {
           addSnackbar({
             key: 'success',
             text: 'Successfully Signed In',
             variant: 'success',
           });
+
+          setCurrentUser(tempUser);
 
           router.push('/dashboard');
         }

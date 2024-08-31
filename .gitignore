@@ -131,3 +131,5 @@ dist
 
 .idea
 **/**/.env
+
+backend/config/firebaseServiceAccountKey.json
