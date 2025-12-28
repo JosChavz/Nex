@@ -25,14 +25,14 @@ export const theme = createTheme({
         light: {
             palette: {
                 background: {
-                    default: "white",
+                    default: "#ffffff",
                 },
             },
         },
         dark: {
             palette: {
                 background: {
-                    default: "black",
+                    default: "#000000",
                 },
             },
         },

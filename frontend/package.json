@@ -11,8 +11,10 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@eslint/eslintrc": "^3.3.3",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
+    "@mui/material-nextjs": "^7.3.6",
     "better-auth": "^1.4.9",
     "mysql2": "^3.16.0",
     "next": "16.1.1",
@@ -24,8 +26,9 @@
     "@types/node": "^20.19.27",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.1",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.1.1",
+    "eslint-config-prettier": "^10.1.8",
     "postcss": "^8",
     "tailwindcss": "^4.1.18",
     "typescript": "^5"
