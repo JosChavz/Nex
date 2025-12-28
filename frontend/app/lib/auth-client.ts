@@ -1,0 +1,13 @@
+import { createAuthClient } from "better-auth/react"
+
+export const authClient = createAuthClient({
+    baseURL: process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || "http://localhost:3001",
+})
+
+export type Session = typeof authClient.$Infer.Session.user;
+
+export const signInWithGoogle = async () => {
+    await authClient.signIn.social({
+        provider: "google",
+    });
+}
