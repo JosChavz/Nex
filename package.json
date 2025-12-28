@@ -1,8 +1,0 @@
-{
-  "devDependencies": {
-    "ts-node": "^10.9.2"
-  },
-  "dependencies": {
-    "@nestjs/typeorm": "^10.0.2"
-  }
-}
