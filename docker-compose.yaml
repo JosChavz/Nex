@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  nex-backend:
+    image: mariadb:latest
+    container_name: mariadb-compose
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: mysql
+      MYSQL_DATABASE: nexdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./backend/database.sql:/docker-entrypoint-initdb.d/1.sql
+    networks:
+      - mariadb_network
+
+volumes:
+  data:
+
+networks:
+  mariadb_network:
+    driver: bridge
