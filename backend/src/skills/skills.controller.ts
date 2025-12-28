@@ -14,7 +14,7 @@ import {
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '@thallesp/nestjs-better-auth';
 import { Public, Roles } from '../roles/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';

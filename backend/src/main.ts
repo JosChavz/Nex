@@ -8,10 +8,17 @@ require('dotenv').config({
 import 'reflect-metadata';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: false,
+  });
+  app.enableCors({
+    origin: [`http://localhost:${process.env.PORT || 3000}`],
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .addBearerAuth({
-      description: `[just text field] Please enter token in following format: Bearer <JWT>`,
+      description: `[just text field] Please enter token in the following format: Bearer <JWT>`,
       name: 'Authorization',
       bearerFormat: 'Bearer',
       scheme: 'Bearer',
