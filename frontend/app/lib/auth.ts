@@ -1,6 +1,7 @@
 import {APIError, betterAuth} from "better-auth";
 import { createPool } from "mysql2/promise";
 import {nextCookies} from "better-auth/next-js";
+import { admin } from "better-auth/plugins"
 
 export const auth = betterAuth({
     database: createPool({
@@ -8,7 +9,7 @@ export const auth = betterAuth({
         user: "root",
         password: "mysql",
         database: "nexdb",
-        timezone: "America/Los_Angeles", // Important to ensure consistent timezone values
+        timezone: "-08:00",
     }),
     socialProviders: {
         google: {
@@ -17,6 +18,8 @@ export const auth = betterAuth({
             accessType: "offline",
             clientId: process.env.GOOGLE_CLIENT_ID as string,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+            callbackURL: "/dashboard",
+            errorCallbackURL: "/forbidden",
         }
     },
     account: {
@@ -32,6 +35,7 @@ export const auth = betterAuth({
     },
     plugins: [
         nextCookies(),
+        admin(),
     ],
     databaseHooks: {
         user: {

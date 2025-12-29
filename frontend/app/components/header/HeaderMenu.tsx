@@ -3,27 +3,32 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import React from "react";
 import {useRouter} from "next/navigation";
 import LoginIcon from '@mui/icons-material/Login';
+import {authClient, Session} from "@/app/lib/auth-client";
+import Link from "next/link";
 
 type HeaderMenuProps = {
     anchorEl: null | HTMLElement;
     handleMenuClose: () => void;
     onProfile?: () => void;
     onSettings?: () => void;
-    session: any;
+    user: Session | undefined;
 };
 
-export default function HeaderMenu({ anchorEl, handleMenuClose, session }: HeaderMenuProps) {
-    const handleLogoutClick = async () => {
-        handleMenuClose();
-        await fetch("/api/auth/logout", {
-            method: "POST",
-        });
-        router.push("/");
-    };
+export default function HeaderMenu({ anchorEl, handleMenuClose, user }: HeaderMenuProps) {
     const router = useRouter();
 
+    const handleLogoutClick = async () => {
+        handleMenuClose();
+        await authClient.signOut({
+            fetchOptions: {
+                onSuccess: () => {
+                    router.push("/login"); // redirect to login page
+                },
+            },
+        });
+    };
 
-    if (!session) {
+    if (!user) {
         return (
             <Menu
                 anchorEl={anchorEl}
@@ -62,7 +67,7 @@ export default function HeaderMenu({ anchorEl, handleMenuClose, session }: Heade
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-                <MenuItem>
+                <MenuItem component={Link} href="/login" onClick={handleMenuClose}>
                     <ListItemIcon>
                         <LoginIcon fontSize="small" />
                     </ListItemIcon>

@@ -7,7 +7,12 @@ import HeaderMenu from "@/app/components/header/HeaderMenu";
 
 export default function HeaderAvatar() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const { data: session, isPending } = authClient.useSession()
+    const {
+        data: session,
+        isPending,
+        error,
+        refetch
+    } = authClient.useSession()
 
     const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -68,7 +73,7 @@ export default function HeaderAvatar() {
                 </Avatar>
             </IconButton>
 
-            <HeaderMenu anchorEl={anchorEl} handleMenuClose={handleMenuClose} session={session} />
+            <HeaderMenu anchorEl={anchorEl} handleMenuClose={handleMenuClose} user={session?.user} />
         </>
     );
 }
