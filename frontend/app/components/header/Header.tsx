@@ -25,14 +25,11 @@ export default function Header() {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <a href={"/dashboard"}>
                         <Typography
-                            variant="h5"
+                            variant="h6"
                             component="div"
-                            sx={{
-                                color: "primary.main",
-                                fontWeight: "bold",
-                            }}
+                            className={'font-black uppercase'}
                         >
-                            NexProjects
+                            nex
                         </Typography>
                     </a>
                 </Box>

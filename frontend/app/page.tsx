@@ -1,13 +1,12 @@
 "use client";
 
-import {Button, Container} from "@mui/material";
-import {signInWithGoogle} from "@/app/lib/auth-client";
+import { Container, Typography} from "@mui/material";
 
 export default function Home() {
   return (
-      <Container>
-        <h1>Login</h1>
-        <Button onClick={() => signInWithGoogle()}>Sign in with Google</Button>
+      <Container component={"main"} sx={{ mt: 14 }}>
+        <Typography variant={"h1"} component={"h1"} className={'font-black uppercase'}>Nex</Typography>
+        <Typography variant={'body2'} className={'italic'}>what is your next project?</Typography>
       </Container>
   );
 }
