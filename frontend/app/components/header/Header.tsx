@@ -18,6 +18,8 @@ export default function Header() {
                 bgcolor: (theme) => theme.palette.background.paper,
                 color: (theme) => theme.palette.text.primary,
                 boxShadow: 1,
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                position: "relative",
             }}
         >
             <Toolbar sx={{ justifyContent: "space-between", py: 1 }}>
