@@ -14,6 +14,10 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL("/", request.url));
     }
 
+    if (session && session.user.onboarding) {
+        return NextResponse.redirect(new URL("/onboarding", request.url));
+    }
+
     return NextResponse.next();
 }
 

@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import {AppThemeProvider} from "@/app/providers/AppThemeProvider";
 import Header from "@/app/components/header/Header";
+import React from "react";
 
 export const metadata: Metadata = {
-  title: 'Acme Dashboard',
+  title: 'Nex',
   description: 'The official Next.js Course Dashboard, built with App Router.',
 };
 
