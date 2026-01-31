@@ -7,24 +7,32 @@ export async function proxy(request: NextRequest) {
         headers: await headers()
     })
 
-    // THIS IS NOT SECURE!
-    // This is the recommended approach to optimistically redirect users
-    // We recommend handling auth checks in each page/route
+    const isApiRoute = request.nextUrl.pathname.startsWith("/api/");
+    const isOnboarding = request.nextUrl.pathname.startsWith("/onboarding");
+
     if(!session) {
+        if (isApiRoute) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
         return NextResponse.redirect(new URL("/", request.url));
     }
 
-    if (session && session.user.onboarding) {
+    if (session.user.onboarding && !isOnboarding) {
+        if (isApiRoute) {
+            return NextResponse.json({ error: "Onboarding not completed" }, { status: 403 });
+        }
         return NextResponse.redirect(new URL("/onboarding", request.url));
     }
 
     return NextResponse.next();
 }
 
-// TODO: Should this be better? If so, how would that affect the function's behavior?
 export const config = {
     matcher: [
         "/dashboard/:path*",
-        '/'
+        "/onboarding/:path*",
+        "/api/users/:path*",
+        "/api/projects/:path*",
+        "/api/onboarding/:path*",
     ],
 };
