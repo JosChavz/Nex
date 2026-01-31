@@ -35,6 +35,10 @@ export const auth = betterAuth({
             required: false,
             defaultValue: "",
         },
+          graduationYear: {
+            type: "number",
+            required: true,
+          },
         major: {
             type: "string",
             required: true,
