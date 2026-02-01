@@ -7,8 +7,9 @@ export async function proxy(request: NextRequest) {
         headers: await headers()
     })
 
-    const isApiRoute = request.nextUrl.pathname.startsWith("/api/");
-    const isOnboarding = request.nextUrl.pathname.startsWith("/onboarding");
+    const pathname = request.nextUrl.pathname;
+    const isApiRoute = pathname.startsWith("/api/");
+    const isOnboardingRoute = pathname.startsWith("/onboarding") || pathname.startsWith("/api/onboarding");
 
     if(!session) {
         if (isApiRoute) {
@@ -17,7 +18,7 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL("/", request.url));
     }
 
-    if (session.user.onboarding && !isOnboarding) {
+    if (session.user.onboarding && !isOnboardingRoute) {
         if (isApiRoute) {
             return NextResponse.json({ error: "Onboarding not completed" }, { status: 403 });
         }
