@@ -1,16 +1,10 @@
 import {db} from "@/app/lib/db";
 
 export async function GET() {
-    let client;
-
     try {
-        client = await db.getConnection();
-        const query = "SELECT * FROM user";
-        const [result] = await client.query(query);
-        client.release();
+        const [result] = await db.query("SELECT * FROM user");
         return new Response(JSON.stringify(result), { status: 200 });
     } catch (e) {
-        if (client) client.release();
         return new Response("Error fetching users", { status: 500 });
     }
 }

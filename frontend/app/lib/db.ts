@@ -17,6 +17,7 @@ const pool =
         queueLimit: 0,
         enableKeepAlive: true,
         keepAliveInitialDelay: 10000,
+        idleTimeout: 60000,
     });
 
 if (process.env.NODE_ENV !== "production") {

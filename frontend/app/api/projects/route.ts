@@ -7,28 +7,18 @@ import { auth } from "@/app/lib/auth";
 import { headers } from "next/headers";
 import {db} from "@/app/lib/db";
 
-const session = await auth.api.getSession({
-    headers: await headers()
-});
-
 /**
  * Get all projects
  * TODO: Integrate pagination
  * @tag Public
  */
 export async function GET() {
-    let client;
-
     try {
-        client = await db.getConnection();
-        const query = "SELECT * FROM projects";
-        const [rows] = await client.execute(query);
+        const [rows] = await db.execute("SELECT * FROM projects");
         return new Response(JSON.stringify({data: rows}), { status: 200 });
     } catch(e) {
-        if (client) client.release();
+        return new Response("Error fetching projects", { status: 500 });
     }
-
-    return new Response("GET request to /api/projects", { status: 200 });
 }
 
 /**
@@ -36,11 +26,15 @@ export async function GET() {
  * @constructor
  */
 export async function POST() {
-  if (!session) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
 
-  return new Response("POST request to /api/projects", { status: 200 });
+    if (!session) {
+        return new Response("Unauthorized", { status: 401 });
+    }
+
+    return new Response("POST request to /api/projects", { status: 200 });
 }
 
 /**
@@ -48,6 +42,10 @@ export async function POST() {
  * @constructor
  */
 export async function PUT() {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
     if (!session) {
         return new Response("Unauthorized", { status: 401 });
     }
