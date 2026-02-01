@@ -35,46 +35,11 @@ export const auth = betterAuth({
             required: false,
             defaultValue: "",
         },
-          graduationYear: {
-            type: "number",
-            required: true,
-          },
-        major: {
-            type: "string",
-            required: true,
-            defaultValue: "",
-        },
-        minor: {
-            type: "string",
-            required: true,
-            defaultValue: "",
-        },
         pronouns: {
             type: "string",
             required: true,
             defaultValue: "",
         },
-          bio: {
-            type: "string",
-            required: false,
-          },
-          birthdate: {
-            type: "date",
-            required: false,
-          },
-          linkedURL: {
-            type: "string",
-            required: false,
-          },
-          githubURL: {
-            type: "string",
-            required: false,
-          },
-          resumeURL: {
-            type: "string",
-            required: false,
-          },
-          // Everyone needs to do the onboarding
           onboarding: {
             type: "boolean",
             defaultValue: true,

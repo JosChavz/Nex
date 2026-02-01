@@ -7,6 +7,7 @@ const userMetaBase = {
   interests: z.array(z.string()).nullable(),
   clubs: z.array(z.string()).nullable(),
   lookingFor: z.array(z.string()).nullable(),
+  bio: z.string().nullable(),
 };
 
 // GET response — full record from the database
@@ -20,7 +21,6 @@ export const userMetaGetSchema = z.object({
 
 // POST request — creating a new user_meta record
 const optionalStringArray = z.array(z.string()).optional();
-
 const graduationYearSchema = z
     .string()
     .trim()
@@ -33,6 +33,7 @@ export const userMetaPostSchema = z.object({
     interests: optionalStringArray,
     clubs: optionalStringArray,
     lookingFor: optionalStringArray,
+    bio: z.string().nullable(),
 });
 
 export type UserMetaGet = z.infer<typeof userMetaGetSchema>;

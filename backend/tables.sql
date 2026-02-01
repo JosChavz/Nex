@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS `user_meta` (
     `id` VARCHAR(36) PRIMARY KEY NOT NULL,
     `userId` VARCHAR(36) NOT NULL UNIQUE,
+    `bio` TEXT NULL,
     `graduationYear` VARCHAR(4) NULL,
     `courses` JSON NULL,
     `interests` JSON NULL,
